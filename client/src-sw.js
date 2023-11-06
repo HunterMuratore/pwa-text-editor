@@ -19,6 +19,15 @@ const pageCache = new CacheFirst({
   ],
 });
 
+const staleWhileRevalidate = new StaleWhileRevalidate({
+  cacheName: 'assets-cache',
+  plugins: [
+    new CacheableResponsePlugin({
+      statuses: [0, 200],
+    }),
+  ]
+});
+
 warmStrategyCache({
   urls: ['/index.html', '/'],
   strategy: pageCache,
@@ -26,5 +35,4 @@ warmStrategyCache({
 
 registerRoute(({ request }) => request.mode === 'navigate', pageCache);
 
-// TODO: Implement asset caching
-registerRoute();
+registerRoute(/\.(css|jpg|jpeg|png|gif|js)$/, staleWhileRevalidate);
