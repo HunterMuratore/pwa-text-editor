@@ -1,1 +1,1 @@
-# pwa-text-editor
+# Just Another Text Editor

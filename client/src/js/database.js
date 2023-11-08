@@ -16,18 +16,19 @@ export const putDb = async (content) => {
   const db = await openDB('jate_db', 1);
   const tx = db.transaction('jate_store', 'readwrite');
   const store = tx.objectStore('jate_store');
-  await store.put(content, key);
-  await tx.done;
-  console.log('Added content to the database:', content);
+  const result = await store.put({id: 1, value: content});
+  console.log('Added content to the database:', result.value);
 }
 
 export const getDb = async () => {
   const db = await openDB('jate_db', 1);
   const tx = db.transaction('jate_store', 'readonly');
   const store = tx.objectStore('jate_store');
-  const content = await store.get(1);
+  const text = await store.get(1);
+  console.log(text)
   await tx.done;
-  console.log('Retrieved content from the database:', content);
+  console.log('Retrieved content from the database:', text);
+  return text?.value;
 }
 
 initdb();

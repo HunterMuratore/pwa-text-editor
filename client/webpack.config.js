@@ -3,9 +3,42 @@ const WebpackPwaManifest = require('webpack-pwa-manifest');
 const path = require('path');
 const { InjectManifest } = require('workbox-webpack-plugin');
 
+const is_prod = process.env.NODE_ENV.trim() === 'production'
+
+const plugins =  [
+  new HtmlWebpackPlugin({
+    template: './index.html',
+    filename: 'index.html',
+  }),  
+]
+
+if (is_prod) {
+  plugins.push(...[
+    new WebpackPwaManifest({
+      name: 'Text Editor',
+      short_name: 'TXT Ed',
+      description: 'This app is a progessive web app text editor that runs in the browser and functions both online and offline.',
+      background_color: '#fff',
+      theme_color: '#000',
+      publicPath: '/',
+      inject: true,
+      icons: [
+        {
+          src: path.resolve('src/images/logo.png'),
+          sizes: [96, 128, 192, 256, 384, 512],
+        },
+      ],
+    }),
+    new InjectManifest({
+      swSrc: './src-sw.js',
+      swDest: 'service-worker.js',
+    })
+  ])
+}
+
 module.exports = () => {
   return {
-    mode: 'development',
+    mode: is_prod ? 'production' : 'development',
     entry: {
       main: './src/js/index.js',
       install: './src/js/install.js'
@@ -14,31 +47,7 @@ module.exports = () => {
       filename: '[name].bundle.js',
       path: path.resolve(__dirname, 'dist'),
     },
-    plugins: [
-      new HtmlWebpackPlugin({
-        template: './src/index.html',
-        filename: 'index.html',
-      }),
-
-      new WebpackPwaManifest({
-        name: 'Text Editor',
-        short_name: 'TXT Ed',
-        description: 'This app is a progessive web app text editor that runs in the browser and functions both online and offline.',
-        background_color: '#fff',
-        theme_color: '#000',
-        icons: [
-          {
-            src: path.resolve('src/images/logo.png'),
-            sizes: [96, 128, 192, 256, 384, 512],
-          },
-        ],
-      }),
-
-      new InjectManifest({
-        swSrc: './src/src-sw.js',
-        swDest: 'service-worker.js',
-      }),
-    ],
+    plugins,
     module: {
       rules: [
         {
